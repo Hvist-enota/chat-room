@@ -27,6 +27,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapGet("/", () => Results.Ok(new
+{
+    service = "ChatRoom API",
+    swagger = "/swagger",
+    health = "/health"
+}));
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
