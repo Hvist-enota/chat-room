@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ChatRoom.Api/ChatRoom.Api.csproj" />
+  <Project Path="ChatRoom.DatabaseTests/ChatRoom.DatabaseTests.csproj" />
+  <Project Path="ChatRoom.IntegrationTests/ChatRoom.IntegrationTests.csproj" />
+  <Project Path="ChatRoom.UnitTests/ChatRoom.UnitTests.csproj" />
+</Solution>
