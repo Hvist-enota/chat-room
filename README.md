@@ -66,13 +66,16 @@ Included test categories:
 
 Scripts in [k6](k6):
 
-- `k6/get-messages-pagination.js`
-- `k6/concurrent-send-messages.js`
+- `k6/smoke/smoke-api.js`
+- `k6/load/load-messages-pagination.js`
+- `k6/stress/stress-concurrent-send-messages.js`
 
-Example run:
+Example runs:
 
 ```bash
-k6 run -e BASE_URL=http://localhost:5189 -e ROOM_ID=<room-guid> -e USER_ID=<user-guid> k6/get-messages-pagination.js
+k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=<room-guid> -e USER_ID=<user-guid> k6/smoke/smoke-api.js
+k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=<room-guid> -e USER_ID=<user-guid> k6/load/load-messages-pagination.js
+k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=<room-guid> -e USER_ID=<user-guid> k6/stress/stress-concurrent-send-messages.js
 ```
 
 ## CI

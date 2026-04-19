@@ -10,7 +10,7 @@ export const options = {
   },
 };
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:5189';
+const BASE_URL = __ENV.BASE_URL || 'http://localhost:5203';
 const ROOM_ID = __ENV.ROOM_ID;
 const USER_ID = __ENV.USER_ID;
 
