@@ -1,0 +1,42 @@
+name: Migration Check
+
+on:
+  pull_request:
+
+jobs:
+  migration-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate migration presence when model changed
+        shell: bash
+        run: |
+          BASE_REF="origin/${{ github.base_ref }}"
+          git fetch origin "${{ github.base_ref }}"
+          CHANGED_FILES=$(git diff --name-only "$BASE_REF"...HEAD)
+
+          MODEL_CHANGED=false
+          MIGRATION_CHANGED=false
+
+          if echo "$CHANGED_FILES" | grep -E '^ChatRoom.Api/(Data/ChatRoomDbContext.cs|Domain/.*\.cs)$' > /dev/null; then
+            MODEL_CHANGED=true
+          fi
+
+          if echo "$CHANGED_FILES" | grep -E '^ChatRoom.Api/Migrations/.*\.(cs|sql)$' > /dev/null; then
+            MIGRATION_CHANGED=true
+          fi
+
+          echo "Model changed: $MODEL_CHANGED"
+          echo "Migration changed: $MIGRATION_CHANGED"
+
+          if [ "$MODEL_CHANGED" = true ] && [ "$MIGRATION_CHANGED" = false ]; then
+            echo "Db model changed but no migration files were updated under ChatRoom.Api/Migrations/."
+            exit 1
+          fi
+
+          echo "Migration check passed."
