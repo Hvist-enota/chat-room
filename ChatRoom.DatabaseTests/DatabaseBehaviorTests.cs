@@ -47,7 +47,7 @@ public sealed class DatabaseBehaviorTests(DatabaseFixture fixture) : IClassFixtu
             Name = fixtureData.Create<string>(),
             Description = fixtureData.Create<string>(),
             CreatedBy = adminId,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = TestTime.UtcNow(),
             IsPrivate = false,
             MaxMembers = 5
         };
@@ -59,7 +59,7 @@ public sealed class DatabaseBehaviorTests(DatabaseFixture fixture) : IClassFixtu
                 Id = Guid.NewGuid(),
                 RoomId = room.Id,
                 UserId = adminId,
-                JoinedAt = fixtureData.Create<DateTime>(),
+                JoinedAt = TestTime.EnsureUtc(fixtureData.Create<DateTime>()),
                 Role = MemberRole.Admin
             },
             new Member
@@ -67,7 +67,7 @@ public sealed class DatabaseBehaviorTests(DatabaseFixture fixture) : IClassFixtu
                 Id = Guid.NewGuid(),
                 RoomId = room.Id,
                 UserId = memberId,
-                JoinedAt = fixtureData.Create<DateTime>(),
+                JoinedAt = TestTime.EnsureUtc(fixtureData.Create<DateTime>()),
                 Role = MemberRole.Member
             });
 
@@ -92,7 +92,7 @@ public sealed class DatabaseBehaviorTests(DatabaseFixture fixture) : IClassFixtu
         var room = await db.Rooms.AsNoTracking().FirstAsync();
         var member = await db.Members.AsNoTracking().FirstAsync(x => x.RoomId == room.Id);
 
-        var firstTime = DateTime.UtcNow;
+        var firstTime = TestTime.UtcNow();
         var sameTimestampContentA = new SendMessageRequest("same-time-a");
         var sameTimestampContentB = new SendMessageRequest("same-time-b");
 
