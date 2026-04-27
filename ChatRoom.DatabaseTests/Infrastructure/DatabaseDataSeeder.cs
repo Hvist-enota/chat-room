@@ -29,7 +29,9 @@ public static class DatabaseDataSeeder
                 Id = Guid.NewGuid(),
                 Name = faker.Commerce.ProductName(),
                 Description = faker.Lorem.Sentence(12),
+                
                 CreatedBy = creatorId,
+
                 CreatedAt = faker.Date.PastOffset(2).UtcDateTime,
                 IsPrivate = faker.Random.Bool(0.3f),
                 MaxMembers = faker.Random.Int(20, 80)
