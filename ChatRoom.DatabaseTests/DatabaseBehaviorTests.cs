@@ -44,8 +44,8 @@ public sealed class DatabaseBehaviorTests(DatabaseFixture fixture) : IClassFixtu
         var room = new Room
         {
             Id = Guid.NewGuid(),
-            Name = fixtureData.Create<string>(),
-            Description = fixtureData.Create<string>(),
+            Name = $"room-{Guid.NewGuid():N}"[..37],
+            Description = $"description-{Guid.NewGuid():N}"[..48],
             CreatedBy = adminId,
             CreatedAt = TestTime.UtcNow(),
             IsPrivate = false,
