@@ -7,6 +7,11 @@ namespace ChatRoom.IntegrationTests.Infrastructure;
 
 public static class IntegrationDataSeeder
 {
+    private static string Limit(string value, int maxLength)
+    {
+        return value.Length <= maxLength ? value : value[..maxLength];
+    }
+
     public static async Task SeedLargeAsync(ChatRoomDbContext db)
     {
         if (await db.Rooms.AnyAsync())
@@ -18,8 +23,8 @@ public static class IntegrationDataSeeder
 
         var roomFaker = new Faker<Room>()
             .RuleFor(x => x.Id, _ => Guid.NewGuid())
-            .RuleFor(x => x.Name, f => f.Commerce.Department())
-            .RuleFor(x => x.Description, f => f.Lorem.Sentence(10))
+            .RuleFor(x => x.Name, f => Limit(f.Commerce.Department(), 120))
+            .RuleFor(x => x.Description, f => Limit(f.Lorem.Sentence(10), 1000))
             .RuleFor(x => x.CreatedBy, _ => Guid.NewGuid())
             .RuleFor(x => x.CreatedAt, f => f.Date.PastOffset(1).UtcDateTime)
             .RuleFor(x => x.IsPrivate, f => f.Random.Bool(0.2f))
@@ -70,7 +75,7 @@ public static class IntegrationDataSeeder
                     Id = Guid.NewGuid(),
                     RoomId = room.Id,
                     UserId = users[random.Next(users.Length)],
-                    Content = $"seed-message-{room.Id:N}-{i}",
+                    Content = Limit($"seed-message-{room.Id:N}-{i}", 2000),
                     SentAt = sentAt,
                     IsEdited = false,
                     EditedAt = null
@@ -87,7 +92,7 @@ public static class IntegrationDataSeeder
                 Id = Guid.NewGuid(),
                 RoomId = room.Id,
                 UserId = users[random.Next(users.Length)],
-                Content = $"seed-extra-{Guid.NewGuid():N}",
+                Content = Limit($"seed-extra-{Guid.NewGuid():N}", 2000),
                 SentAt = DateTime.UtcNow.AddSeconds(-random.Next(1, 1_000_000)),
                 IsEdited = false
             });

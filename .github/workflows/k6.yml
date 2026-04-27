@@ -1,0 +1,63 @@
+name: k6
+
+on:
+  pull_request:
+
+jobs:
+  smoke-k6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install jq
+        run: sudo apt-get update; sudo apt-get install -y jq
+
+      - name: Start PostgreSQL
+        run: docker compose up -d
+
+      - name: Start API
+        run: |
+          ASPNETCORE_URLS=http://localhost:5203 dotnet run --project ChatRoom.Api > api.log 2>&1 &
+          for i in {1..40}; do
+            if curl -fsS http://localhost:5203/health > /dev/null; then
+              echo "API is healthy"
+              break
+            fi
+            sleep 2
+          done
+          curl -fsS http://localhost:5203/health > /dev/null
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Prepare smoke test data
+        run: |
+          USER_ID=$(uuidgen)
+          ROOM_RESPONSE=$(curl -fsS -X POST http://localhost:5203/api/rooms \
+            -H "Content-Type: application/json" \
+            -H "X-User-Id: ${USER_ID}" \
+            -d '{"name":"k6-smoke-room","description":"ci-smoke","isPrivate":false,"maxMembers":10}')
+          ROOM_ID=$(echo "$ROOM_RESPONSE" | jq -r '.id')
+          echo "USER_ID=${USER_ID}" >> $GITHUB_ENV
+          echo "ROOM_ID=${ROOM_ID}" >> $GITHUB_ENV
+
+      - name: Run k6 smoke
+        run: k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=${{ env.ROOM_ID }} -e USER_ID=${{ env.USER_ID }} k6/smoke/smoke-api.js
+
+      - name: Run k6 load
+        run: k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=${{ env.ROOM_ID }} -e USER_ID=${{ env.USER_ID }} k6/load/load-messages-pagination.js
+
+      - name: Run k6 stress
+        run: k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=${{ env.ROOM_ID }} -e USER_ID=${{ env.USER_ID }} k6/stress/stress-concurrent-send-messages.js
+
+      - name: API logs on failure
+        if: failure()
+        run: cat api.log

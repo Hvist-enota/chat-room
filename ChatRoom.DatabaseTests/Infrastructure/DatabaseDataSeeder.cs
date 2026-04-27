@@ -7,6 +7,11 @@ namespace ChatRoom.DatabaseTests.Infrastructure;
 
 public static class DatabaseDataSeeder
 {
+    private static string Limit(string value, int maxLength)
+    {
+        return value.Length <= maxLength ? value : value[..maxLength];
+    }
+
     public static async Task SeedLargeAsync(ChatRoomDbContext db)
     {
         if (await db.Rooms.AnyAsync())
@@ -27,9 +32,11 @@ public static class DatabaseDataSeeder
             var room = new Room
             {
                 Id = Guid.NewGuid(),
-                Name = faker.Commerce.ProductName(),
-                Description = faker.Lorem.Sentence(12),
+                Name = Limit(faker.Commerce.ProductName(), 120),
+                Description = Limit(faker.Lorem.Sentence(12), 1000),
+                
                 CreatedBy = creatorId,
+
                 CreatedAt = faker.Date.PastOffset(2).UtcDateTime,
                 IsPrivate = faker.Random.Bool(0.3f),
                 MaxMembers = faker.Random.Int(20, 80)
@@ -73,7 +80,7 @@ public static class DatabaseDataSeeder
                     Id = Guid.NewGuid(),
                     RoomId = room.Id,
                     UserId = roomUsers[random.Next(roomUsers.Length)],
-                    Content = faker.Lorem.Sentence(8),
+                    Content = Limit(faker.Lorem.Sentence(8), 2000),
                     SentAt = room.CreatedAt.AddSeconds(i),
                     IsEdited = false,
                     EditedAt = null
@@ -90,7 +97,7 @@ public static class DatabaseDataSeeder
                 Id = Guid.NewGuid(),
                 RoomId = room.Id,
                 UserId = roomUsers[random.Next(roomUsers.Length)],
-                Content = faker.Lorem.Sentence(10),
+                Content = Limit(faker.Lorem.Sentence(10), 2000),
                 SentAt = DateTime.UtcNow.AddSeconds(-random.Next(1, 900_000)),
                 IsEdited = false,
                 EditedAt = null

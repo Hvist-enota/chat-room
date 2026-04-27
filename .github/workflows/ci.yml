@@ -24,5 +24,11 @@ jobs:
       - name: Build
         run: dotnet build ChatRoom.slnx --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test ChatRoom.slnx --configuration Release --no-build --verbosity normal
+      - name: Test Unit
+        run: dotnet test ChatRoom.UnitTests/ChatRoom.UnitTests.csproj --configuration Release --no-restore --verbosity normal
+
+      - name: Test Integration
+        run: dotnet test ChatRoom.IntegrationTests/ChatRoom.IntegrationTests.csproj --configuration Release --no-restore --verbosity normal
+
+      - name: Test Database
+        run: dotnet test ChatRoom.DatabaseTests/ChatRoom.DatabaseTests.csproj --configuration Release --no-restore --verbosity normal
