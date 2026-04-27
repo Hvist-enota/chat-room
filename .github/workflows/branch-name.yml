@@ -14,12 +14,12 @@ jobs:
           BRANCH_NAME="${{ github.head_ref }}"
           echo "Branch: $BRANCH_NAME"
 
-          PATTERN='^(feature|bugfix|hotfix|chore|refactor|test|docs)/[a-z0-9._-]+$'
+          PATTERN='^(dev|(feature|bugfix|hotfix|chore|refactor|test|docs)/[a-z0-9._-]+)$'
 
           if [[ ! "$BRANCH_NAME" =~ $PATTERN ]]; then
             echo "Invalid branch name: $BRANCH_NAME"
-            echo "Use format: type/short-description"
-            echo "Allowed types: feature, bugfix, hotfix, chore, refactor, test, docs"
+            echo "Use format: type/short-description or dev"
+            echo "Allowed: dev, feature, bugfix, hotfix, chore, refactor, test, docs"
             exit 1
           fi
 
