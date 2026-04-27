@@ -52,6 +52,12 @@ jobs:
       - name: Run k6 smoke
         run: k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=${{ env.ROOM_ID }} -e USER_ID=${{ env.USER_ID }} k6/smoke/smoke-api.js
 
+      - name: Run k6 load
+        run: k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=${{ env.ROOM_ID }} -e USER_ID=${{ env.USER_ID }} k6/load/load-messages-pagination.js
+
+      - name: Run k6 stress
+        run: k6 run -e BASE_URL=http://localhost:5203 -e ROOM_ID=${{ env.ROOM_ID }} -e USER_ID=${{ env.USER_ID }} k6/stress/stress-concurrent-send-messages.js
+
       - name: API logs on failure
         if: failure()
         run: cat api.log
